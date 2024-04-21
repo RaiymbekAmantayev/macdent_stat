@@ -1,6 +1,6 @@
 <template>
 <!-- <h1>STATIC</h1>-->
-  <h1>Аналитика данных</h1>
+<!--  <h1>Аналитика данных</h1>-->
   <section class="main">
     <table>
       <tr>
