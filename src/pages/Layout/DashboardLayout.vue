@@ -11,10 +11,6 @@
         <md-icon>dashboard</md-icon>
         <p>Dashboard</p>
       </sidebar-link>
-      <sidebar-link to="/user">
-        <md-icon>person</md-icon>
-        <p>User Profile</p>
-      </sidebar-link>
       <sidebar-link to="/table">
         <md-icon>content_paste</md-icon>
         <p>Table list</p>
@@ -50,9 +46,9 @@
       >
       </fixed-plugin>
       <datestat></datestat>
-      <diagramm></diagramm>
+<!--      <diagramm></diagramm>-->
 
-      <dashboard-content> </dashboard-content>
+<!--      <dashboard-content> </dashboard-content>-->
       <content-footer v-if="!$route.meta.hideFooter"></content-footer>
     </div>
   </div>
@@ -61,19 +57,19 @@
 <script>
 import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
-import DashboardContent from "./Content.vue";
+// import DashboardContent from "./Content.vue";
 import MobileMenu from "@/pages/Layout/MobileMenu.vue";
 import FixedPlugin from "./Extra/FixedPlugin.vue";
-import Diagramm from "@/pages/Layout/Diagramm.vue";
+// import Diagramm from "@/pages/Layout/Diagramm.vue";
 import Datestat from "@/pages/Layout/DateStat.vue";
 
 export default {
   components: {
     TopNavbar,
-    DashboardContent,
+    // DashboardContent,
     ContentFooter,
     MobileMenu,
-    Diagramm,
+    // Diagramm,
     Datestat,
     FixedPlugin,
   },
