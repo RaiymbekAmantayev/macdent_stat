@@ -2,6 +2,75 @@
 <!-- <h1>STATIC</h1>-->
 <!--  <h1>Аналитика данных</h1>-->
   <section class="main">
+    <div class="select__wrapper">
+      <div class="select__wrapper-text">
+        За
+      </div>
+      <select class="selecting" v-model="selectedValue" @change="updateChart">
+        <option value="day">Текущий день</option>
+        <option value="week">Текущая неделя</option>
+        <option value="month">Текущий месяц</option>
+        <option value="period">Указать период</option>
+        <option value="custom">За период</option>
+      </select>
+      <div class="selecting" v-if="selectedValue === 'period'">
+        <label for="startDate">Начальная дата:</label>
+        <input type="date" id="startDate" v-model="startDate">
+
+        <label for="endDate">Конечная дата:</label>
+        <input type="date" id="endDate" v-model="endDate">
+      </div>
+    </div>
+    <div class="about">
+      <div class="about__content">
+        <div class="about__content-text">
+          Выручка
+        </div>
+        <div class="about__content-price">
+          {{currentValue.total_paid}}
+        </div>
+      </div>
+      <hr>
+      <div class="about__content">
+        <div class="about__content-text">
+          Средний чек
+        </div>
+        <div v-if="currentValue.avg_paid" class="about__content-price">
+          {{ Math.floor(currentValue.avg_paid) }}
+        </div>
+        <div v-if="!currentValue.avg_paid" class="about__content-price">
+          {{0}}
+        </div>
+      </div>
+      <hr>
+      <div class="about__content">
+        <div class="about__content-text">
+          Количество продаж
+        </div>
+        <div class="about__content-price">
+          {{currentValue.count}}
+        </div>
+      </div>
+      <hr>
+      <div class="about__content">
+        <div class="about__content-text">
+          Себестоимость
+        </div>
+        <div class="about__content-price">
+          0
+        </div>
+      </div>
+      <hr>
+      <div class="about__content">
+        <div class="about__content-text">
+          Валовая прибыль
+        </div>
+        <div class="about__content-price">
+          0
+        </div>
+      </div>
+      <hr>
+    </div>
     <table>
       <tr>
         <th>Названия</th>
@@ -87,75 +156,7 @@
         <td>{{this.patients.whereKnow.old_db.month}}</td>
       </tr>
     </table>
-    <div class="select__wrapper">
-      <div class="select__wrapper-text">
-        За
-      </div>
-      <select class="selecting" v-model="selectedValue" @change="updateChart">
-        <option value="day">Текущий день</option>
-        <option value="week">Текущая неделя</option>
-        <option value="month">Текущий месяц</option>
-        <option value="period">Указать период</option>
-        <option value="custom">За период</option>
-      </select>
-      <div class="selecting" v-if="selectedValue === 'period'">
-        <label for="startDate">Начальная дата:</label>
-        <input type="date" id="startDate" v-model="startDate">
 
-        <label for="endDate">Конечная дата:</label>
-        <input type="date" id="endDate" v-model="endDate">
-      </div>
-    </div>
-    <div class="about">
-      <div class="about__content">
-        <div class="about__content-text">
-          Выручка
-        </div>
-        <div class="about__content-price">
-          {{currentValue.total_paid}}
-        </div>
-      </div>
-      <hr>
-      <div class="about__content">
-        <div class="about__content-text">
-          Средний чек
-        </div>
-        <div v-if="currentValue.avg_paid" class="about__content-price">
-          {{ Math.floor(currentValue.avg_paid) }}
-        </div>
-        <div v-if="!currentValue.avg_paid" class="about__content-price">
-          {{0}}
-        </div>
-      </div>
-      <hr>
-      <div class="about__content">
-        <div class="about__content-text">
-          Количество продаж
-        </div>
-        <div class="about__content-price">
-          {{currentValue.count}}
-        </div>
-      </div>
-      <hr>
-      <div class="about__content">
-        <div class="about__content-text">
-          Себестоимость
-        </div>
-        <div class="about__content-price">
-          0
-        </div>
-      </div>
-      <hr>
-      <div class="about__content">
-        <div class="about__content-text">
-          Валовая прибыль
-        </div>
-        <div class="about__content-price">
-          0
-        </div>
-      </div>
-      <hr>
-    </div>
 
 
     <input type="date" id="startDate" class="custom-input" style="display:none;">
