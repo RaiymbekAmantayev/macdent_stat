@@ -16,7 +16,7 @@
         <td>{{payments.total_paid_month}}</td>
       </tr>
       <tr>
-        <td>количество записей на сегодня</td>
+        <td>количество записей</td>
         <td>{{record.count_for_today}}</td>
         <td>{{record.count_week}}</td>
         <td>{{record.count_month}}</td>
@@ -39,9 +39,10 @@
       </tr>
       <tr>
         <td>средний чек</td>
-        <td>{{payments.avg_paid_day}}</td>
-        <td>{{payments.avg_paid_week}}</td>
-        <td>{{ payments.avg_paid_month }}</td>
+        <td v-if="!payments.avg_paid_day">0</td>
+        <td v-else-if="payments.avg_paid_day">{{Math.floor(payments.avg_paid_day)}}</td>
+        <td> {{Math.floor(payments.avg_paid_week)}}</td>
+        <td>{{Math.floor( payments.avg_paid_month) }}</td>
       </tr>
       <tr>
         <td>Kaspi pay</td>
@@ -90,12 +91,20 @@
       <div class="select__wrapper-text">
         За
       </div>
-      <select v-model="selectedValue" @change="updateChart">
+      <select class="selecting" v-model="selectedValue" @change="updateChart">
         <option value="day">Текущий день</option>
         <option value="week">Текущая неделя</option>
         <option value="month">Текущий месяц</option>
+        <option value="period">Указать период</option>
         <option value="custom">За период</option>
       </select>
+      <div class="selecting" v-if="selectedValue === 'period'">
+        <label for="startDate">Начальная дата:</label>
+        <input type="date" id="startDate" v-model="startDate">
+
+        <label for="endDate">Конечная дата:</label>
+        <input type="date" id="endDate" v-model="endDate">
+      </div>
     </div>
     <div class="about">
       <div class="about__content">
@@ -111,8 +120,11 @@
         <div class="about__content-text">
           Средний чек
         </div>
-        <div class="about__content-price">
-          {{currentValue.avg_paid}}
+        <div v-if="currentValue.avg_paid" class="about__content-price">
+          {{ Math.floor(currentValue.avg_paid) }}
+        </div>
+        <div v-if="!currentValue.avg_paid" class="about__content-price">
+          {{0}}
         </div>
       </div>
       <hr>
@@ -150,6 +162,7 @@
     <input type="date" id="endDate" class="custom-input" style="display:none;">
 
     <canvas id="myChart"></canvas>
+    <DoctorTotal :doctorTotal="doctors.doctorTotal" :busy_time="doctors.busy_Time" :countCheck="this.doctors.doctorTotalByCount"/>
   </section>
 </template>
 
@@ -157,8 +170,11 @@
 import Chart from 'chart.js/auto';
 import axios from "axios";
 import {API_KEY} from "@/pages/API_KEY";
-
+// import Dashboard from "@/pages/Dashboard.vue";
+import DoctorTotal from "@/pages/Layout/DoctorTotal.vue";
+// import {hasOwn} from "vue/src/shared/util";
 export default {
+  props:{},
   data() {
     return {
       record: {
@@ -176,6 +192,13 @@ export default {
         rejected_week:null,
         rejected_month:null,
         awaited: null,
+      },
+      doctors:{
+        Doctors : [],
+        count: null,
+        doctorTotal: {},
+        doctorTotalByCount:{},
+        busy_Time:{}
       },
       payments :{
         allDetail: {},
@@ -226,6 +249,8 @@ export default {
         allRef_day: null
       },
       selectedValue: 'day',
+      startDate: '',
+      endDate: '',
       myChart: null,
       currentValue:{
         total_paid: null,
@@ -236,9 +261,15 @@ export default {
       data:[]
     };
   },
+  components:{
+    // Dashboard
+    DoctorTotal
+  },
   async mounted() {
     this.initializeChart();
-    this.toggleDateInputs();
+    this.toggleDateInputs()
+
+
     const promisesPayment = [];
     function filterPaymentsByDateRange(ResultQuery, startDate, endDate) {
       return ResultQuery.filter(payment => {
@@ -254,6 +285,7 @@ export default {
     const ResPayments = responsePayment.flatMap(response=>{
       return response.data.pays
     })
+
     // console.log("allPayments-2022-2024: ",ResPayments)
     // let whereKnows = axios.get(`https://api-developer.macdent.kz/where_know/find/?access_token=${API_KEY}`)
     // this.whereKnow = whereKnows.data.items
@@ -270,8 +302,48 @@ export default {
     const endTomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate()+1);
     this.payments.allPayments = filterPaymentsByDateRange(ResPayments, startDate, endDate)
     // console.log("AllPayments: ", this.payments.allPayments)
+    try {
+      const promises = [];
+      for (let i = 1; i <= 72; i++) {
+        promises.push(axios.get(`https://api-developer.macdent.kz/zapis/find/?page=${i}&access_token=${API_KEY}`));
+      }
+      const responses = await Promise.all(promises);
+      const Records = responses.flatMap(response => {
+        return response.data.zapisi;
+      });
+      let AllRec = filterPaymentsByDateRange(Records, startDate, endDate)
+      this.record.allRecords = AllRec
+      let tomorrow = filterPaymentsByDateRange(this.record.allRecords, startTomorrow, endTomorrow)
+      this.record.count_for_tomorrow = tomorrow.length
+      // console.log(this.record.allRecords)
+      let today = filterPaymentsByDateRange(this.record.allRecords, startDay, endDay)
+      let record_today = today.filter(record => record.status === 3 || record.status === 4 || record.status === 5 || record.status === 6);
+      this.record.came_day = record_today.length
+      let record_rej_day = today.filter(record => record.status === 2);
+      this.record.count_for_today = today.length
+      this.record.rejected_day = record_rej_day.length
 
-    const monthResult = await this.getTotalPaid.call(this, this.payments.allPayments, StartMonth, endMonth);
+      let week = filterPaymentsByDateRange(this.record.allRecords, startWeek, endWeek)
+      let record_week = week.filter(record => record.status === 3 || record.status === 4 || record.status === 5 || record.status === 6);
+      // console.log("week's rec: ", record_week)
+      this.record.came_week = record_week.length
+      let record_rej_week = week.filter(record => record.status === 2);
+      this.record.count_week = week.length
+      this.record.rejected_week = record_rej_week.length
+
+      let month = filterPaymentsByDateRange(this.record.allRecords, StartMonth, endMonth)
+      let record_month = month.filter(record => record.status === 3 || record.status === 4 || record.status === 5 || record.status === 6);
+      this.record.came_month = record_month.length
+      let record_rej_month = month.filter(record => record.status === 2);
+      this.record.count_month = month.length
+      this.record.rejected_month = record_rej_month.length
+
+      // console.log("zapis for today: ",this.record.count_for_today)
+      // console.log("zapis for tomorrow: ",this.record.count_for_tomorrow)
+    } catch (error) {
+      // console.error("An error occurred while fetching data:", error);
+    }
+    const monthResult = await this.getTotalPaid.call(this, this.payments.allPayments,this.record.allRecords, StartMonth, endMonth);
     this.payments.total_paid_month = monthResult.total_paid;
     this.payments.avg_paid_month = monthResult.total_avg;
     this.payments.count_month = monthResult.count;
@@ -282,7 +354,7 @@ export default {
     this.patients.whereKnow.recomend.month = monthResult.rec
     this.patients.whereKnow.old_db.month = monthResult.old_db
     this.whereKnow.allRef_month = monthResult.allRef
-    const weekResult = await this.getTotalPaid.call(this, this.payments.allPayments, startWeek, endWeek);
+    const weekResult = await this.getTotalPaid.call(this, this.payments.allPayments,this.record.allRecords, startWeek, endWeek);
     this.payments.total_paid_week = weekResult.total_paid;
     this.payments.avg_paid_week = weekResult.total_avg;
     this.payments.count_week = weekResult.count;
@@ -293,7 +365,7 @@ export default {
     this.patients.whereKnow.recomend.week = weekResult.rec
     this.patients.whereKnow.old_db.week = weekResult.old_db
     this.whereKnow.allRef_week = weekResult.allRef
-    const dayResult = await this.getTotalPaid.call(this, this.payments.allPayments, startDay, endDay);
+    const dayResult = await this.getTotalPaid.call(this, this.payments.allPayments,this.record.allRecords,  startDay, endDay);
     this.payments.total_paid_day = dayResult.total_paid;
     this.payments.avg_paid_day = dayResult.total_avg;
     this.payments.count_day = dayResult.count;
@@ -327,48 +399,22 @@ export default {
       // console.log("payments by day: ", paymentsByDay_InDay)
       this.data = totalPaidByArray_InDay;
       this.label = key_day
+      // console.log("allDoctor is", this.doctors.doctorTotal)
     }
+      // console.log("records from dateStat: ",this.record.allRecords)
 
-    try {
-      const promises = [];
-      for (let i = 1; i <= 72; i++) {
-        promises.push(axios.get(`https://api-developer.macdent.kz/zapis/find/?page=${i}&access_token=${API_KEY}`));
+  },
+  watch: {
+
+    startDate: function(newDate, oldDate) {
+      if (newDate && this.endDate) {
+        this.updateChart();
       }
-      const responses = await Promise.all(promises);
-      const Records = responses.flatMap(response => {
-        return response.data.zapisi;
-      });
-      this.record.allRecords = filterPaymentsByDateRange(Records, startDate, endDate)
-      let tomorrow = filterPaymentsByDateRange(this.record.allRecords, startTomorrow, endTomorrow)
-      this.record.count_for_tomorrow = tomorrow.length
-
-      let today = filterPaymentsByDateRange(this.record.allRecords, startDay, endDay)
-      let record_today = today.filter(record => record.status === 3 || record.status === 4 || record.status === 5 || record.status === 6);
-      // console.log("today's rec", record_today)
-      this.record.came_day = record_today.length
-      let record_rej_day = today.filter(record => record.status === 2);
-      this.record.count_for_today = today.length
-      this.record.rejected_day = record_rej_day.length
-
-      let week = filterPaymentsByDateRange(this.record.allRecords, startWeek, endWeek)
-      let record_week = week.filter(record => record.status === 3 || record.status === 4 || record.status === 5 || record.status === 6);
-      // console.log("week's rec: ", record_week)
-      this.record.came_week = record_week.length
-      let record_rej_week = week.filter(record => record.status === 2);
-      this.record.count_week = week.length
-      this.record.rejected_week = record_rej_week.length
-
-      let month = filterPaymentsByDateRange(this.record.allRecords, StartMonth, endMonth)
-      let record_month = month.filter(record => record.status === 3 || record.status === 4 || record.status === 5 || record.status === 6);
-      this.record.came_month = record_month.length
-      let record_rej_month = month.filter(record => record.status === 2);
-      this.record.count_month = month.length
-      this.record.rejected_month = record_rej_month.length
-
-      // console.log("zapis for today: ",this.record.count_for_today)
-      // console.log("zapis for tomorrow: ",this.record.count_for_tomorrow)
-    } catch (error) {
-      // console.error("An error occurred while fetching data:", error);
+    },
+    endDate: function(newDate, oldDate) {
+      if (newDate && this.startDate) {
+        this.updateChart();
+      }
     }
   },
   methods: {
@@ -379,12 +425,22 @@ export default {
       return paymentDate >= startDate && paymentDate <= endDate;
     });
   },
-    async getTotalPaid(allPayments, startDate, endDate){
+    async getDoctors(){
+      this.doctors.Doctors = []
+      this.doctors.Doctors.push(axios.get(`https://api-developer.macdent.kz/doctor/find/?access_token=${API_KEY}`));
+      const DoctorInfo = await Promise.all(this.doctors.Doctors)
+      let allDoctor = DoctorInfo.flatMap(response=>response.data.doctors)
+      return allDoctor
+    },
+    async getTotalPaid(allPayments,allRecords, startDate, endDate){
       let promisesDetailPayment = [];
       let patiensList = []
       let kaspiPay = 0
       let Cash = 0
       let allPayment = this.filterPaymentsByDateRange(allPayments, startDate, endDate)
+      let allRecord = this.filterPaymentsByDateRange(allRecords, startDate, endDate)
+      // console.log("allRec: ", this.record.allRecords)
+      // let allRecord = this.record.allRecords
       for(const pays of allPayment){
         if (pays.typeOplata && pays.typeOplata.length > 0) {
           let typePay = pays.typeOplata[0];
@@ -407,6 +463,18 @@ export default {
       let rec = 0
       let old_db = 0
       let allRef = 0
+      let allDoctor = {};
+      let allDoctorById = {}
+      let DrTotalByCount = {}
+      const allDоctorByIdFreeTime = {}
+      allDoctor = await this.getDoctors();
+      allDoctor.forEach(doctor => {
+        this.doctors.doctorTotal[doctor.name] = 0;
+        allDoctorById[doctor.id] = 0;
+        DrTotalByCount[doctor.id]=0
+        allDоctorByIdFreeTime[doctor.id] = 0 // Предполагая, что doctor.id является ключом в объекте allDoctorById
+      });
+
       for (let patient of allPatient) {
         if (patient.whereKnow) {
             allRef+=1
@@ -432,9 +500,60 @@ export default {
       let total_avg = 0
       count = allDetail.length
       for (const detail of allDetail) {
-        // this.payments.total_by_check += parseInt(detail.totalByCheck);
         total_paid += parseInt(detail.totalPaid);
       }
+      allDetail.forEach(pay => {
+        const doctorId = pay.doctor;
+        const paymentSum = parseInt(pay.totalPaid);
+        if (allDoctorById.hasOwnProperty(doctorId)) {
+          allDoctorById[doctorId] += paymentSum;
+          DrTotalByCount[doctorId] += 1
+        }
+      });
+      allRecord.forEach(zapisi => {
+        const doctorId = zapisi.doctor
+        const startParts = zapisi.start.split(' ');
+        const endParts = zapisi.end.split(' ');
+
+        const startDateParts = startParts[0].split('.');
+        const startTimeParts = startParts[1].split(':');
+        const start = new Date(startDateParts[2], startDateParts[1] - 1, startDateParts[0], startTimeParts[0], startTimeParts[1], startTimeParts[2]);
+
+        const endDateParts = endParts[0].split('.');
+        const endTimeParts = endParts[1].split(':');
+        const end = new Date(endDateParts[2], endDateParts[1] - 1, endDateParts[0], endTimeParts[0], endTimeParts[1], endTimeParts[2]);
+
+        const diffTime = end.getTime() - start.getTime();
+        const diffTimeHours = diffTime / (1000 * 60 * 60); // Переводим миллисекунды в часы
+
+        if(allDоctorByIdFreeTime.hasOwnProperty(doctorId)){
+          allDоctorByIdFreeTime[doctorId]+= diffTimeHours
+        }
+      })
+      const valueDoctorFreeTime = Object.values(allDоctorByIdFreeTime)
+      const keyDoctorFreeTime = Object.keys(this.doctors.doctorTotal)
+      const doctorfreeTime = keyDoctorFreeTime.reduce((acc, key, index)=>{
+        acc[key]=valueDoctorFreeTime[index];
+        return acc;
+      }, {})
+      this.doctors.busy_Time = doctorfreeTime
+      // console.log("busy time: ",this.doctors.busy_Time)
+
+      const valueDoctorById = Object.values(allDoctorById)
+      const keyDoctorByName = Object.keys(this.doctors.doctorTotal)
+      const doctorInfo = keyDoctorByName.reduce((acc, key, index) => {
+        acc[key] = valueDoctorById[index];
+        return acc;
+      }, {});
+      const valuesDrCount = Object.values(DrTotalByCount)
+      const keyDrCount = Object.keys(this.doctors.doctorTotal)
+      this.doctors.doctorTotalByCount = keyDrCount.reduce((acc, key,  index)=>{
+        acc[key] = valuesDrCount[index];
+        return acc
+      }, {})
+      // console.log("count of CheckBY dr: ", this.doctors.doctorTotalByCount)
+      this.doctors.doctorTotal = doctorInfo
+      // console.log("docInfo: ",doctorInfo);
       // console.log("result:", total_paid)
       // this.payments.count = allPayment.length
       // this.payments.avg_paid = total_paid/this.payments.count
@@ -466,11 +585,11 @@ export default {
       let label;
       switch (this.selectedValue) {
         case 'day':
-          const dayResult = await this.getTotalPaid.call(this, this.payments.allPayments, startDay, endDay);
+          const dayResult = await this.getTotalPaid.call(this, this.payments.allPayments,this.record.allRecords,  startDay, endDay);
           this.currentValue.total_paid = dayResult.total_paid
           this.currentValue.avg_paid = dayResult.total_avg
           this.currentValue.count = dayResult.count
-
+          // console.log("allDoctor is", this.doctors.doctorTotal)
           const paymentsByDay_InDay = this.groupPaymentsByDate(this.payments.allDetail, payment => {
             const [day, month, year] = payment.split('.');
             const formattedDate = new Date(`${year}-${month}-${day}`);
@@ -492,12 +611,12 @@ export default {
           label = key_day
           break;
         case 'week':
-          const weekResult = await this.getTotalPaid.call(this, this.payments.allPayments, startWeek, endWeek);
+          const weekResult = await this.getTotalPaid.call(this, this.payments.allPayments,this.record.allRecords,  startWeek, endWeek);
             this.currentValue.total_paid = weekResult.total_paid
             this.currentValue.avg_paid = weekResult.total_avg
             this.currentValue.count = weekResult.count
             // console.log("week: ",this.currentValue.total_paid)
-
+          // console.log("allDoctor is", this.doctors.doctorTotal)
           const paymentsByDay = this.groupPaymentsByDate(this.payments.allDetail, payment => {
             const [day, month, year] = payment.split('.');
             const formattedDate = new Date(`${year}-${month}-${day}`);
@@ -519,11 +638,12 @@ export default {
           label = dates_day
           break;
         case 'month':
-          const monthResult = await this.getTotalPaid.call(this, this.payments.allPayments, StartMonth, endMonth);
+          const monthResult = await this.getTotalPaid.call(this, this.payments.allPayments, this.record.allRecords, StartMonth, endMonth);
+            // console.log("startMonth: ", StartMonth)
             this.currentValue.total_paid = monthResult.total_paid
             this.currentValue.avg_paid = monthResult.total_avg
             this.currentValue.count = monthResult.count
-
+          // console.log("allDoctor is", this.doctors.doctorTotal)
           const paymentsByDayInMonth = this.groupPaymentsByDate(this.payments.allDetail, payment => {
             const [day, month, year] = payment.split('.');
             const formattedDate = new Date(`${year}-${month}-${day}`);
@@ -545,15 +665,97 @@ export default {
           data = totalPaidByArray;
           label = dates_week
           break;
-        case 'year':
-          data = [200, 190, 180, 195, 205];
-          break;
+        case 'period':
+          if (!this.startDate || !this.endDate) {
+            return;
+          }
+          const startPeriod = new Date(this.startDate);
+          const endPeriod = new Date(this.endDate);
+          const PeriodResult = await this.getTotalPaid(this.payments.allPayments,this.record.allRecords,  startPeriod, endPeriod);
+
+          // console.log(PeriodResult);
+          // /("startPer: ", startPeriod);
+          // console.log("end: ", endPeriod);
+          this.currentValue.total_paid = PeriodResult.total_paid;
+          this.currentValue.avg_paid = PeriodResult.total_avg;
+          this.currentValue.count = PeriodResult.count;
+          const diffInTime = endPeriod.getTime() - startPeriod.getTime();
+          const diffInDays = diffInTime / (1000 * 3600 * 24);
+          if(diffInDays<=30){
+            const paymentsByDayInPeriod = this.groupPaymentsByDate(this.payments.allDetail, payment => {
+              const [day, month, year] = payment.split('.');
+              const formattedDate = new Date(`${year}-${month}-${day}`);
+              const yearMonthDay = formattedDate.toISOString().split('T')[0]; // Получаем год, месяц и день в формате 'гггг-мм-дд'
+              return yearMonthDay;
+            });
+            const dates_period = Object.keys(paymentsByDayInPeriod)
+            const values_period = Object.values(paymentsByDayInPeriod)
+            const totalPaidByPeriod = [];
+
+            values_period.forEach(paymentsArray => {
+              let totalPaid = 0;
+              paymentsArray.forEach(payment => {
+                totalPaid += parseInt(payment.totalPaid);
+              });
+              totalPaidByPeriod.push(totalPaid);
+            });
+            data = totalPaidByPeriod;
+            label = dates_period
+            break;
+          }else if(diffInDays>30){
+            const paymentsByMonth = this.groupPaymentsByDate(this.payments.allDetail, payment => {
+              const [day, month, year] = payment.split('.'); // Разбиваем строку на день, месяц и год
+              const date = new Date(year, month - 1, day); // Месяцы в JavaScript начинаются с 0
+
+              // Создаем массив с названиями месяцев
+              const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
+              // Возвращаем название месяца по индексу из массива monthNames
+              return monthNames[date.getMonth()];
+            });
+            const PaymentByMonth = []
+            // console.log("pay by month: ",paymentsByMonth)
+            const dates_month = Object.keys(paymentsByMonth)
+            const values_month = Object.values(paymentsByMonth)
+            values_month.forEach(payments =>{
+              let totalPaid= 0
+              payments.forEach(pay=>{
+                totalPaid += parseInt(pay.totalPaid)
+              })
+              PaymentByMonth.push(totalPaid)
+            })
+            label = dates_month
+            data = PaymentByMonth;
+            break;
+          }
         case 'custom':
-            const customResult = await this.getTotalPaid.call(this, this.payments.allPayments, startDate, endDate);
+            const customResult = await this.getTotalPaid.call(this, this.payments.allPayments,this.record.allRecords,  startDate, endDate);
             this.currentValue.total_paid = customResult.total_paid
             this.currentValue.avg_paid = customResult.total_avg
             this.currentValue.count = customResult.count
-          data = [50, 60, 70, 80, 90];
+          const paymentsByMonth = this.groupPaymentsByDate(this.payments.allDetail, payment => {
+            const [day, month, year] = payment.split('.'); // Разбиваем строку на день, месяц и год
+            const date = new Date(year, month - 1, day); // Месяцы в JavaScript начинаются с 0
+
+            // Создаем массив с названиями месяцев
+            const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
+            // Возвращаем название месяца по индексу из массива monthNames
+            return monthNames[date.getMonth()];
+          });
+            const PaymentByMonth = []
+            // console.log("pay by month: ",paymentsByMonth)
+            const dates_month = Object.keys(paymentsByMonth)
+            const values_month = Object.values(paymentsByMonth)
+            values_month.forEach(payments =>{
+              let totalPaid= 0
+              payments.forEach(pay=>{
+                totalPaid += parseInt(pay.totalPaid)
+              })
+              PaymentByMonth.push(totalPaid)
+            })
+            label = dates_month
+          data = PaymentByMonth;
           break;
       }
       this.myChart.data.datasets[0].data = data;
@@ -766,7 +968,7 @@ select option {
     margin-bottom: 5px;
   }
 
-  select {
+  .selecting {
     width: 100%;
   }
 

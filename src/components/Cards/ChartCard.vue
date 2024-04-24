@@ -1,8 +1,8 @@
 <template>
   <md-card>
     <md-card-header
-      class="card-chart"
-      :data-background-color="dataBackgroundColor"
+        class="card-chart"
+        :data-background-color="dataBackgroundColor"
     >
       <div :id="chartId" class="ct-chart"></div>
     </md-card-header>
@@ -94,3 +94,5 @@ export default {
   },
 };
 </script>
+
+

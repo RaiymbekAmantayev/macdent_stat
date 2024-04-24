@@ -42,16 +42,18 @@
 
 <script>
 import {ChartCard, OrderedTable,} from "@/components";
-// import DateStat from "@/pages/Layout/DateStat.vue";
 
 export default {
   props: {
-    labels: Object
+    doctorTotal: Object,
+    busy_time:Object,
+    countCheck:Object
   },
   data() {
     return {
       emailsSubscriptionChart: {
         data: {
+          doctorTotals: {},
           labels: [
             "Ja",
             "Fe",
@@ -103,10 +105,30 @@ export default {
     ChartCard,
     OrderedTable,
   },
-  mounted() {
-    // const count_rec = this.labels
-    // // console.log("records: ", count_rec);
+  async mounted() {
+    // console.log("records: ", this.doctorTotal);
+    // console.log("busy_time_from_DrTT: ", this.busy_time)
+    // console.log("countCheck: ", this.countCheck)
+  },
+  watch: {
+    '$props.doctorTotal': {
+      handler(newDoctorTotal, oldDoctorTotal) {
+        console.log('Данные о докторах обновлены:', newDoctorTotal);
+      },
+      deep: true
+    },
+    '$props.busy_time':{
+      handler(newBusyTime, oldBusyTime) {
+        // console.log('Данные о записей обновлены:', newBusyTime);
+      },
+      deep:true
+    },
+    '$props.countCheck':{
+      handler(newCount, oldCount) {
+        // console.log('Данные о количестве чеков обновлены:', newCount);
+      },
+      deep:true
+    }
   }
-
 };
 </script>

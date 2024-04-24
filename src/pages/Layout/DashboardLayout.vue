@@ -57,8 +57,8 @@
 <script>
 import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
-// import DashboardContent from "./Content.vue";
-import MobileMenu from "@/pages/Layout/MobileMenu.vue";
+import DashboardContent from "./Content.vue";
+// import MobileMenu from "@/pages/Layout/MobileMenu.vue";
 import FixedPlugin from "./Extra/FixedPlugin.vue";
 // import Diagramm from "@/pages/Layout/Diagramm.vue";
 import Datestat from "@/pages/Layout/DateStat.vue";
@@ -68,7 +68,7 @@ export default {
     TopNavbar,
     // DashboardContent,
     ContentFooter,
-    MobileMenu,
+    // MobileMenu,
     // Diagramm,
     Datestat,
     FixedPlugin,
