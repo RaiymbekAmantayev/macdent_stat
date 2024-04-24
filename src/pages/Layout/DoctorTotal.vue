@@ -39,9 +39,9 @@ export default {
     };
   },
   mounted() {
-    this.createChart('chart1', [], []);
-    this.createChart('chart2', [], []);
-    this.createChart('chart3', [], []);
+    this.createChart('chart1', [], [], 'Количество чеков по врачам');
+    this.createChart('chart2', [], [], 'Тотал кассы по врачам');
+    this.createChart('chart3', [], [], 'Количество часов принимавших пациентов');
   },
   watch: {
     countCheck(newCountCheck) {
@@ -215,5 +215,38 @@ export default {
 canvas {
   max-width: 1000px;
   max-height: 1000px;
+}
+@media screen and (max-width: 800px) {
+  canvas {
+    width: 100px;
+    height: 1000px;
+  }
+  .chart-containerFirst{
+    padding: 0;
+    margin: 0;
+  }
+  .chart-containerSecond{
+    padding: 0;
+    margin: 0;
+  }
+  .chart-containerThird{
+    padding: 0;
+    margin: 0;
+  }
+  .chart-infoFirst{
+    width: 80px;
+    padding: 0 0;
+    margin: 0;
+  }
+  .chart-infoSecond{
+    width: 80px;
+    padding: 0 0;
+    margin: 0;
+  }
+  .chart-containerThird{
+    width: 80px;
+    padding: 0 0;
+    margin: 0;
+  }
 }
 </style>
