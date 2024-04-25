@@ -9,17 +9,19 @@
     <div class="chart-containerThird">
       <canvas ref="chart3" width="850" height="300"></canvas>
     </div>
-    <div class="chart-infoFirst">
-      Количество чеков по врачам
-      <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
-    </div>
-    <div class="chart-infoSecond">
-      Тотал кассы по врачам
-      <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
-    </div>
-    <div class="chart-infoThird">
-      Количество часов принимавших пациентов
-      <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
+    <div class="chart-info-wrapper">
+      <div class="chart-infoFirst">
+        Количество чеков по врачам
+        <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
+      </div>
+      <div class="chart-infoSecond">
+        Тотал кассы по врачам
+        <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
+      </div>
+      <div class="chart-infoThird">
+        Количество часов принимавших пациентов
+        <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
+      </div>
     </div>
   </div>
 </template>
@@ -123,13 +125,13 @@ export default {
 
 <style scoped>
 .chart-containerFirst {
-  background-color: #fc3434;
+  background-color: #FC6E51;
   margin-top: 70px;
   color: #fff;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 12px -2px rgba(0,0,0,1);
   width: 900px;
   position: relative;
   z-index: 1;
@@ -139,13 +141,13 @@ export default {
 }
 
 .chart-containerSecond {
-  background-color: #0066FF;
+  background-color: #7fabed;
   margin-top: 70px;
   color: #fff;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 12px -2px rgba(0,0,0,1);
   width: 900px;
   position: relative;
   z-index: 1;
@@ -155,19 +157,23 @@ export default {
 }
 
 .chart-containerThird {
-  background-color: #009900;
+  background-color: #73c173;
   margin-top: 70px;
   color: #fff;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 12px -2px rgba(0,0,0,1);
   width: 900px;
   position: relative;
   z-index: 1;
   margin-left: 180px;
   display: flex;
   justify-content: space-between;
+}
+
+.chart-info-wrapper{
+  display: flex;
 }
 
 .chart-infoFirst {
@@ -218,32 +224,44 @@ canvas {
 }
 @media screen and (max-width: 800px) {
   canvas {
-    width: 100px;
-    height: 1000px;
+    max-width: 100%;
   }
   .chart-containerFirst{
+    max-width: 100%;
+    margin-bottom: 15px;
+    margin-left: 0;
     padding: 0;
-    margin: 0;
+
   }
   .chart-containerSecond{
+    max-width: 100%;
+    margin-bottom: 15px;
     padding: 0;
-    margin: 0;
+    margin-left: 0;
+
   }
   .chart-containerThird{
+    max-width: 100%;
+    margin-bottom: 15px;
     padding: 0;
-    margin: 0;
+    margin-left: 0;
+
   }
   .chart-infoFirst{
+    display: none;
     width: 80px;
     padding: 0 0;
     margin: 0;
   }
   .chart-infoSecond{
+    display: none;
     width: 80px;
     padding: 0 0;
     margin: 0;
   }
-  .chart-containerThird{
+
+  .chart-infoThird{
+    display: none;
     width: 80px;
     padding: 0 0;
     margin: 0;
