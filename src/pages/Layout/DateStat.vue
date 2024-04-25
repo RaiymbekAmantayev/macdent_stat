@@ -71,6 +71,11 @@
       </div>
       <hr>
     </div>
+
+    <input type="date" id="startDate" class="custom-input" style="display:none;">
+    <input type="date" id="endDate" class="custom-input" style="display:none;">
+
+    <canvas id="myChart"></canvas>
     <table>
       <tr>
         <th>Названия</th>
@@ -159,10 +164,6 @@
 
 
 
-    <input type="date" id="startDate" class="custom-input" style="display:none;">
-    <input type="date" id="endDate" class="custom-input" style="display:none;">
-
-    <canvas id="myChart"></canvas>
     <DoctorTotal :doctorTotal="doctors.doctorTotal" :busy_time="doctors.busy_Time" :countCheck="this.doctors.doctorTotalByCount"/>
   </section>
 </template>
@@ -366,6 +367,27 @@ export default {
     this.patients.whereKnow.recomend.week = weekResult.rec
     this.patients.whereKnow.old_db.week = weekResult.old_db
     this.whereKnow.allRef_week = weekResult.allRef
+    const paymentsByDay = this.groupPaymentsByDate(weekResult.allDetail, payment => {
+      const [day, month, year] = payment.split('.');
+      const formattedDate = new Date(`${year}-${month}-${day}`);
+      const yearMonthDay = formattedDate.toISOString().split('T')[0]; // Получаем год, месяц и день в формате 'гггг-мм-дд'
+      return yearMonthDay;
+    });
+    const dates_day = Object.keys(paymentsByDay)
+    const values_day = Object.values(paymentsByDay)
+    let totalPaidByArray_day = [];
+    values_day.forEach(paymentsArray => {
+      let totalPaid = 0;
+      paymentsArray.forEach(payment => {
+        totalPaid += parseInt(payment.totalPaid);
+      });
+      totalPaidByArray_day.push(totalPaid);
+    });
+    // console.log("payments by day: ", paymentsByDay)
+    this.data = totalPaidByArray_day;
+    this.labels = dates_day
+    // console.log(this.data)
+    // console.log(this.labels)
     const dayResult = await this.getTotalPaid.call(this, this.payments.allPayments,this.record.allRecords,  startDay, endDay);
     this.payments.total_paid_day = dayResult.total_paid;
     this.payments.avg_paid_day = dayResult.total_avg;
@@ -380,33 +402,23 @@ export default {
     if(this.selectedValue == "day") {
       this.currentValue.total_paid = dayResult.total_paid
       this.currentValue.avg_paid = dayResult.total_avg
-      this.currentValue.count = dayResult.count
-      const paymentsByDay_InDay = this.groupPaymentsByDate(this.payments.allDetail, payment => {
-        const [day, month, year] = payment.split('.');
-        const formattedDate = new Date(`${year}-${month}-${day}`);
-        const yearMonthDay = formattedDate.toISOString().split('T')[0]; // Получаем год, месяц и день в формате 'гггг-мм-дд'
-        return yearMonthDay;
-      });
-      const key_day = Object.keys(paymentsByDay_InDay)
-      const value_day = Object.values(paymentsByDay_InDay)
-      let totalPaidByArray_InDay = [];
-      value_day.forEach(paymentsArray => {
-        let totalPaid = 0;
-        paymentsArray.forEach(payment => {
-          totalPaid += parseInt(payment.totalPaid);
-        });
-        totalPaidByArray_InDay.push(totalPaid);
-      });
-      // console.log("payments by day: ", paymentsByDay_InDay)
-      this.data = totalPaidByArray_InDay;
-      this.label = key_day
-      // console.log("allDoctor is", this.doctors.doctorTotal)
+      this.currentValue.count = dayResult.count;
     }
-      // console.log("records from dateStat: ",this.record.allRecords)
-
   },
-  watch: {
 
+  watch: {
+    labels: function(newLabel, oldLabel) {
+      if (newLabel && this.labels) {
+        // console.log("Labels changed: ", newLabel);
+        this.updateChart();
+      }
+    },
+    data: function(newData, oldData) {
+      if (newData && this.data) {
+        // console.log("Data changed: ", newData);
+        this.updateChart();
+      }
+    },
     startDate: function(newDate, oldDate) {
       if (newDate && this.endDate) {
         this.updateChart();
@@ -559,7 +571,7 @@ export default {
       // this.payments.count = allPayment.length
       // this.payments.avg_paid = total_paid/this.payments.count
       total_avg = total_paid/count
-      return { total_paid, total_avg, count, kaspiPay, Cash, two_gis, internet, rec, old_db, allRef };
+      return { total_paid, total_avg, count, kaspiPay, Cash, two_gis, internet, rec, old_db, allRef,allDetail };
     },
     groupPaymentsByDate(payments, groupingFunction) {
       const groupedPayments = {};
@@ -591,25 +603,8 @@ export default {
           this.currentValue.avg_paid = dayResult.total_avg
           this.currentValue.count = dayResult.count
           // console.log("allDoctor is", this.doctors.doctorTotal)
-          const paymentsByDay_InDay = this.groupPaymentsByDate(this.payments.allDetail, payment => {
-            const [day, month, year] = payment.split('.');
-            const formattedDate = new Date(`${year}-${month}-${day}`);
-            const yearMonthDay = formattedDate.toISOString().split('T')[0]; // Получаем год, месяц и день в формате 'гггг-мм-дд'
-            return yearMonthDay;
-          });
-          const key_day = Object.keys(paymentsByDay_InDay)
-          const value_day = Object.values(paymentsByDay_InDay)
-          let totalPaidByArray_InDay= [];
-          value_day.forEach(paymentsArray => {
-            let totalPaid = 0;
-            paymentsArray.forEach(payment => {
-              totalPaid += parseInt(payment.totalPaid);
-            });
-            totalPaidByArray_InDay.push(totalPaid);
-          });
-          // console.log("payments by day: ", paymentsByDay)
-          data = totalPaidByArray_InDay;
-          label = key_day
+          data = this.data;
+          label = this.labels
           break;
         case 'week':
           const weekResult = await this.getTotalPaid.call(this, this.payments.allPayments,this.record.allRecords,  startWeek, endWeek);
