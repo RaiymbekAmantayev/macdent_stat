@@ -11,15 +11,15 @@
     </div>
     <div class="chart-info-wrapper">
       <div class="chart-infoFirst">
-        Количество чеков по врачам
+        <!-- Количество чеков по врачам -->
         <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
       </div>
       <div class="chart-infoSecond">
-        Тотал кассы по врачам
+        <!-- Тотал кассы по врачам -->
         <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
       </div>
       <div class="chart-infoThird">
-        Количество часов принимавших пациентов
+        <!-- Количество часов принимавших пациентов -->
         <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
       </div>
     </div>
@@ -47,7 +47,7 @@ export default {
   },
   watch: {
     countCheck(newCountCheck) {
-      this.updateChart('chart1', Object.keys(newCountCheck), Object.values(newCountCheck),'Количество чеков по врачам' );
+      this.updateChart('chart1', Object.keys(newCountCheck), Object.values(newCountCheck), 'Количество чеков по врачам');
       // console.log("count: ",newCountCheck)
     },
     doctorTotal(newDoctorTotal) {
@@ -75,31 +75,36 @@ export default {
           }]
         },
         options: {
+          responsive: false,
+          // maintainAspectRatio: false,
           indexAxis: 'y',
           scales: {
-            yAxes: [{
-              gridLines: {
-                display: false,
-                color: 'white'
+            y: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.3)'
               },
               ticks: {
-                fontColor: 'white',
-                beginAtZero: true
+                color: 'white',
+                beginAtZero: true,
+                font: {
+                  size: 15,
+                  family: 'Helvetica',
+                }
               }
-            }],
-            xAxes: [{
-              gridLines: {
-                display: false,
-                color: 'white'
+            },
+
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.3)'
               },
               ticks: {
-                fontColor: 'white'
+                color: 'white'
               }
-            }],
+            },
           },
-          legend: {
-            labels: {
-              fontColor: 'white'
+          plugins: {
+            legend: {
+              display: false
             }
           },
           barPercentage: 0.6,
@@ -124,6 +129,8 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 .chart-containerFirst {
   background-color: #FC6E51;
   margin-top: 70px;
@@ -131,13 +138,14 @@ export default {
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
-  box-shadow: 0px 0px 12px -2px rgba(0,0,0,1);
+  box-shadow: 0px 0px 20px 0px #ff5432;
   width: 900px;
   position: relative;
   z-index: 1;
   margin-left: 180px;
   display: flex;
   justify-content: space-between;
+  height: 300;
 }
 
 .chart-containerSecond {
@@ -147,13 +155,14 @@ export default {
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
-  box-shadow: 0px 0px 12px -2px rgba(0,0,0,1);
+  box-shadow: 0px 0px 20px 0px #78aeff;
   width: 900px;
   position: relative;
   z-index: 1;
   margin-left: 180px;
   display: flex;
   justify-content: space-between;
+  height: 300;
 }
 
 .chart-containerThird {
@@ -163,16 +172,17 @@ export default {
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
-  box-shadow: 0px 0px 12px -2px rgba(0,0,0,1);
+  box-shadow: 0px 0px 20px 0px #54c954;
   width: 900px;
   position: relative;
   z-index: 1;
   margin-left: 180px;
   display: flex;
   justify-content: space-between;
+  height: 300;
 }
 
-.chart-info-wrapper{
+.chart-info-wrapper {
   display: flex;
 }
 
@@ -180,13 +190,14 @@ export default {
   width: 900px;
   margin: 0 auto;
   text-align: center;
+  opacity: 0.7;
   padding: 20px 0;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   position: absolute;
-  right: 223px;
-  top: 2009px;
+  right: 209px;
+  top: 2186px;
   height: 320px;
 }
 
@@ -195,12 +206,13 @@ export default {
   margin: 0 auto;
   text-align: center;
   padding: 20px 0;
+  opacity: 0.7;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   position: absolute;
-  right: 223px;
-  top: 2409px;
+  right: 209px;
+  top: 2586px;
   height: 320px;
 }
 
@@ -209,12 +221,13 @@ export default {
   margin: 0 auto;
   text-align: center;
   padding: 20px 0;
+  opacity: 0.7;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   position: absolute;
-  right: 223px;
-  top: 1609px;
+  right: 209px;
+  top: 1767px;
   height: 320px;
 }
 
@@ -222,45 +235,53 @@ canvas {
   max-width: 1000px;
   max-height: 1000px;
 }
+
 @media screen and (max-width: 800px) {
   canvas {
-    max-width: 100%;
+    max-width: 97%;
+    max-height: 137px;
   }
-  .chart-containerFirst{
-    max-width: 100%;
+
+  .chart-containerFirst {
+    max-width: 97%;
     margin-bottom: 15px;
     margin-left: 0;
     padding: 0;
-
+    margin: 0 auto 15px;
+    height: none;
   }
-  .chart-containerSecond{
-    max-width: 100%;
+
+  .chart-containerSecond {
+    max-width: 97%;
     margin-bottom: 15px;
     padding: 0;
     margin-left: 0;
-
+    margin: 0 auto 15px;
   }
-  .chart-containerThird{
-    max-width: 100%;
+
+  .chart-containerThird {
+    max-width: 97%;
     margin-bottom: 15px;
     padding: 0;
-    margin-left: 0;
-
+    margin: 0 auto 15px;
   }
-  .chart-infoFirst{
+
+  .chart-infoFirst {
     display: none;
     width: 80px;
     padding: 0 0;
     margin: 0;
   }
-  .chart-infoSecond{
+
+  .chart-infoSecond {
     display: none;
     width: 80px;
     padding: 0 0;
     margin: 0;
   }
 
-  .chart-infoThird{
+
+  .chart-infoThird {
     display: none;
     width: 80px;
     padding: 0 0;
