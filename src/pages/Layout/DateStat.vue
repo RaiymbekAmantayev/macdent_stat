@@ -174,7 +174,7 @@
 
 
     <DoctorTotal :doctorTotal="doctors.doctorTotal" :busy_time="doctors.busy_Time"
-                 :countCheck="this.doctors.doctorTotalByCount" />
+      :countCheck="this.doctors.doctorTotalByCount" />
   </section>
 </template>
 
@@ -183,7 +183,7 @@ import Chart from 'chart.js/auto';
 import axios from "axios";
 import { API_KEY } from "@/pages/API_KEY";
 // import Dashboard from "@/pages/Dashboard.vue";
-import DoctorTotal from "@/pages/Layout/DoctorTotal.vue";
+import DoctorTotal from "@/pages/Layout/DoctorTotal_2.0.vue";
 // import {hasOwn} from "vue/src/shared/util";
 export default {
   props: {},
