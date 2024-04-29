@@ -640,7 +640,7 @@ export default {
             totalPaidByArray_day.push(totalPaid);
           });
           // console.log("payments by day: ", paymentsByDay)
-          data = totalPaidByArray_day;
+          data = totalPaidByArray_day
           label = dates_day
           break;
         case 'month':
@@ -668,7 +668,7 @@ export default {
             totalPaidByArray.push(totalPaid);
           });
           this.data = totalPaidByArray
-          data = totalPaidByArray;
+          data = totalPaidByArray
           label = dates_week
           break;
         case 'period':
@@ -705,7 +705,7 @@ export default {
               });
               totalPaidByPeriod.push(totalPaid);
             });
-            data = totalPaidByPeriod;
+            data = totalPaidByPeriod
             label = dates_period
             break;
           } else if (diffInDays > 30) {
@@ -731,7 +731,7 @@ export default {
               PaymentByMonth.push(totalPaid)
             })
             label = dates_month
-            data = PaymentByMonth;
+            data = PaymentByMonth
             break;
           }
         case 'custom':
@@ -761,11 +761,13 @@ export default {
             PaymentByMonth.push(totalPaid)
           })
           label = dates_month
-          data = PaymentByMonth;
+          data = PaymentByMonth
           break;
       }
-      this.myChart.data.datasets[0].data = data;
-      this.myChart.data.labels = label;
+      const reversedData = [...data].reverse();
+      const revLabel = [...label].reverse()
+      this.myChart.data.datasets[0].data = reversedData;
+      this.myChart.data.labels = revLabel;
       this.myChart.update();
 
 
