@@ -1,20 +1,17 @@
 <template>
   <div>
     <div class="chart-containerFirst">
-      <div class="chart-title">Количество чеков по врачам</div>
       <canvas ref="chart1" width="850" height="300"></canvas>
     </div>
     <div class="chart-containerSecond">
-      <div class="chart-title">Тотал кассы по врачам</div>
       <canvas ref="chart2" width="850" height="300"></canvas>
     </div>
     <div class="chart-containerThird">
-      <div class="chart-title">Количество часов принимавших пациентов</div>
       <canvas ref="chart3" width="850" height="300"></canvas>
     </div>
     <div class="chart-info-wrapper">
       <div class="chart-infoFirst">
-<!--        Количество чеков по врачам -->
+        <!-- Количество чеков по врачам -->
         <!-- Здесь можете добавить любую информацию, которую хотите отображать -->
       </div>
       <div class="chart-infoSecond">
@@ -138,7 +135,6 @@ export default {
   background-color: #FC6E51;
   margin-top: 70px;
   color: #fff;
-  text-align: center;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
@@ -151,21 +147,13 @@ export default {
   justify-content: space-between;
   height: 300;
 }
-.chart-title {
-  position: absolute;
-  top: 10px; /* Отступ от верхнего края */
-  left: 0;
-  right: 0;
-  color: #fff; /* Цвет текста */
-  font-size: 18px; /* Размер шрифта */
-}
+
 .chart-containerSecond {
   background-color: #7fabed;
   margin-top: 70px;
   color: #fff;
   padding: 20px;
   margin-bottom: 20px;
-  text-align: center;
   border-radius: 10px;
   box-shadow: 0px 0px 20px 0px #78aeff;
   width: 900px;
@@ -183,7 +171,6 @@ export default {
   color: #fff;
   padding: 20px;
   margin-bottom: 20px;
-  text-align: center;
   border-radius: 10px;
   box-shadow: 0px 0px 20px 0px #54c954;
   width: 900px;
@@ -254,15 +241,12 @@ canvas {
     max-width: 97%;
     max-height: 137px;
   }
-  .chart-title {
-    font-size: 10px;
-    margin-top: -10px/* Уменьшаем размер шрифта */
-  }
+
   .chart-containerFirst {
     max-width: 97%;
     margin-bottom: 15px;
     margin-left: 0;
-    padding: 10px;
+    padding: 0;
     margin: 0 auto 15px;
     height: none;
   }
@@ -270,7 +254,7 @@ canvas {
   .chart-containerSecond {
     max-width: 97%;
     margin-bottom: 15px;
-    padding: 10px;
+    padding: 0;
     margin-left: 0;
     margin: 0 auto 15px;
   }
@@ -278,7 +262,7 @@ canvas {
   .chart-containerThird {
     max-width: 97%;
     margin-bottom: 15px;
-    padding: 10px;
+    padding: 0;
     margin: 0 auto 15px;
   }
 
