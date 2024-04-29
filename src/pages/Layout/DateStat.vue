@@ -996,7 +996,7 @@ select option {
 
 
   table {
-    max-width: 95%;
+    max-width: 70%;
   }
 
   td {
