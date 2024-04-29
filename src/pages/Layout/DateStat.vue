@@ -1000,12 +1000,12 @@ select option {
   }
 
   td {
-    padding: 8px 8px 8px 8px;
+    padding: 5px 5px 5px 5px;
   }
 
   th {
     text-align: center;
-    padding: 80px 60px 8px 8px;
+    padding: 60px 40px 6px 6px;
   }
 
   tr:nth-child(even) {
