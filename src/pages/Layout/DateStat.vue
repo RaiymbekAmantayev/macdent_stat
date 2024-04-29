@@ -174,7 +174,7 @@
 
 
     <DoctorTotal :doctorTotal="doctors.doctorTotal" :busy_time="doctors.busy_Time"
-      :countCheck="this.doctors.doctorTotalByCount" />
+                 :countCheck="this.doctors.doctorTotalByCount" />
   </section>
 </template>
 
@@ -183,7 +183,7 @@ import Chart from 'chart.js/auto';
 import axios from "axios";
 import { API_KEY } from "@/pages/API_KEY";
 // import Dashboard from "@/pages/Dashboard.vue";
-import DoctorTotal from "@/pages/Layout/DoctorTotal_2.0.vue";
+import DoctorTotal from "@/pages/Layout/DoctorTotal.vue";
 // import {hasOwn} from "vue/src/shared/util";
 export default {
   props: {},
@@ -907,6 +907,8 @@ th {
 
 .about__content {
   display: flex;
+  font-family: 'Roboto';
+  font-weight: 700;
   justify-content: space-between;
 }
 
@@ -991,6 +993,7 @@ select option {
   font-size: 14px;
   width: 200px;
 }
+
 @media screen and (max-width: 800px) {
 
 
@@ -1004,7 +1007,7 @@ select option {
 
   th {
     text-align: center;
-    padding: 80px 2px 80px 2px;
+    padding: 80px 60px 8px 8px;
   }
 
   tr:nth-child(even) {
@@ -1012,8 +1015,9 @@ select option {
   }
 
   .about__content {
-    flex-direction: column;
+    flex-direction: row;
     text-align: center;
+    padding: 0 10px;
   }
 
   .about__content-text,
