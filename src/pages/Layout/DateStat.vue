@@ -79,10 +79,10 @@
     <canvas id="myChart"></canvas>
     <div class="table-overlay">
       <div class="table-overlayTextOne">
-        Macdent-stats
+        Employees Stats
       </div>
       <div class="table-overlayTextTwo">
-        Analyse
+        Employees
       </div>
     </div>
     <table>
