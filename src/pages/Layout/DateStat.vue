@@ -991,7 +991,6 @@ select option {
   font-size: 14px;
   width: 200px;
 }
-
 @media screen and (max-width: 800px) {
 
 
@@ -1005,7 +1004,7 @@ select option {
 
   th {
     text-align: center;
-    padding: 80px 60px 8px 8px;
+    padding: 80px 2px 80px 2px;
   }
 
   tr:nth-child(even) {
