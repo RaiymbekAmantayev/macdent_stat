@@ -175,6 +175,7 @@
 
     <DoctorTotal :doctorTotal="doctors.doctorTotal" :busy_time="doctors.busy_Time"
       :countCheck="this.doctors.doctorTotalByCount" />
+    <RecordsDiagramm :allRecordsByPeriod="record.allRecordsByMonth" />
   </section>
 </template>
 
@@ -182,7 +183,7 @@
 import Chart from 'chart.js/auto';
 import axios from "axios";
 import { API_KEY } from "@/pages/API_KEY";
-// import Dashboard from "@/pages/Dashboard.vue";
+import RecordsDiagramm from "@/pages/Layout/RecordsDiagramm.vue";
 import DoctorTotal from "@/pages/Layout/DoctorTotal_2.0.vue";
 // import {hasOwn} from "vue/src/shared/util";
 export default {
@@ -191,6 +192,7 @@ export default {
     return {
       record: {
         allRecords: {},
+        allRecordsByMonth: {},
         zapisi: null,
         count_for_tomorrow: null,
         count_for_today: null,
@@ -274,7 +276,7 @@ export default {
     };
   },
   components: {
-    // Dashboard
+    RecordsDiagramm,
     DoctorTotal
   },
   async mounted() {
@@ -344,6 +346,7 @@ export default {
       this.record.rejected_week = record_rej_week.length
 
       let month = filterPaymentsByDateRange(this.record.allRecords, StartMonth, endMonth)
+      this.record.allRecordsByMonth = month
       let record_month = month.filter(record => record.status === 3 || record.status === 4 || record.status === 5 || record.status === 6);
       this.record.came_month = record_month.length
       let record_rej_month = month.filter(record => record.status === 2);
