@@ -175,7 +175,7 @@
 
     <DoctorTotal :doctorTotal="doctors.doctorTotal" :busy_time="doctors.busy_Time"
       :countCheck="this.doctors.doctorTotalByCount" />
-    <RecordsDiagramm :allRecordsByPeriod="record.allRecordsByMonth" />
+<!--    <RecordsDiagramm :allRecordsByPeriod="record.allRecordsByMonth" />-->
   </section>
 </template>
 
@@ -276,8 +276,8 @@ export default {
     };
   },
   components: {
-    RecordsDiagramm,
-    DoctorTotal
+    // RecordsDiagramm,
+    DoctorTotal,
   },
   async mounted() {
     this.initializeChart();

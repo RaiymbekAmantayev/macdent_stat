@@ -1,58 +1,188 @@
 <template>
-  <div>
-  <h1>Res</h1>
-  <div>
-  <button @click="DayRes">day</button>
-  </div>
-  <div>
-  <button @click="WeekRes">week</button>
-  </div>
-  <div>
-  <button @click="MonthRes">month</button>
-  </div>
-  <div>
-  <h2>{{result}}</h2>
-  </div>
+  <div style="margin-top: 5%" class="chartWrapper">
+    <div class="btn-container">
+      <button @click="updateChart('hour')">День</button>
+      <button @click="updateChart('day')">Неделя</button>
+      <button @click="updateChart('weekday')">Месяц</button>
+    </div>
+
+    <div id="chart-container">
+      <canvas id="myChart-Records"></canvas>
+    </div>
   </div>
 </template>
 
 <script>
+import Chart from 'chart.js/auto';
+import axios from "axios";
+import {API_KEY} from "@/pages/API_KEY";
+
 export default {
-  props: {
-    allRecordsByPeriod: [],
-  },
   data() {
     return {
-      chartInstances: {}, // Хранение экземпляров графиков
-      times:["07:00", "08.00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00","16:00","17:00","18:00", "19:00","20:00"], // Добавлена запятая
-      result: []
+      NewClient : [],
+      OldClient: [],
+      label: [],
+      times:["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00","16:00","17:00","18:00", "19:00","20:00"],
+      initialData: {
+        labels: this.label,
+        datasets: [
+          {
+            label: 'Первоходки',
+            data: this.NewClient,
+            backgroundColor: '#31b7e3',
+          },
+          {
+            label: 'Старые',
+            data: this.OldClient,
+            backgroundColor: '#070551',
+          }
+        ]
+      },
+      initialDay: {
+        labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+        datasets: [
+          {
+            label: 'Первоходки',
+            data: [400, 500, 90, 151, 206, 155, 400],
+            backgroundColor: '#31b7e3',
+          },
+          {
+            label: 'Старые',
+            data: [65, 400, 350, 220, 100, 600, 400],
+            backgroundColor: '#070551',
+          }
+        ]
+      },
+      initialMonth: {
+        labels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл'],
+        datasets: [
+          {
+            label: 'Первоходки',
+            data: [100, 55, 70, 180, 200, 160, 300],
+            backgroundColor: '#31b7e3',
+          },
+          {
+            label: 'Старые',
+            data: [405, 100, 310, 200, 160, 300, 410],
+            backgroundColor: '#070551',
+          }
+        ]
+      },
+      myChart: null,
+      allRecordsByPeriod: null
+    };
+  },
+  async mounted() {
+    const today = new Date()
+    const StartMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate())
+    const endMonth = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const startDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    try{
+      const promises = [];
+      for (let i = 1; i <= 72; i++) {
+        promises.push(axios.get(`https://api-developer.macdent.kz/zapis/find/?page=${i}&access_token=${API_KEY}`));
+      }
+      const responses = await Promise.all(promises);
+      const Records = responses.flatMap(response => {
+        return response.data.zapisi;
+      });
+      this.allRecordsByPeriod = this.filterPaymentsByDateRange(Records, StartMonth, endMonth)
+    var newData = {};
+    let values = this.getTotalRecod(this.allRecordsByPeriod , startDay, endDay);
+    this.label = Object.keys(this.result);
+    let newValue = values.map(arr => arr[0]);
+    let oldValue = values.map(arr => arr[1]);
+    this.NewClient = newValue
+    this.OldClient = oldValue
+    newData = {
+      labels: this.label,
+      datasets: [
+        {
+          label: 'Первоходки',
+          data: this.NewClient,
+          backgroundColor: '#31b7e3',
+        },
+        {
+          label: 'Старые',
+          data: this.OldClient,
+          backgroundColor: '#070551',
+        }
+      ]
     };
 
-  },
-  mounted() {
-    this.WeekRes()
-  },
-  watch: {
-    allRecordsByPeriod(newCountCheck) {
-      console.log("zapisi: ",newCountCheck)
-    },
-    result(newResult) {
-      // Обновляем значение свойства result при его изменении
-      this.result = newResult;
-      console.log("Updated result: ", this.result);
+    // Установка данных в initialData
+    this.initialData.labels = newData.labels;
+    this.initialData.datasets = newData.datasets;
+
+    // Вызов метода updateChart() после установки initialData
+    this.updateChart();
+    }catch (e){
+      // console.log(e)
     }
+    this.initChart();
+  },
+  watch:{
+    initialData(newData){
+      // console.log("labels: ",newData.labels)
+    },
+    myChart(newChart){
+      // console.log("chartNew: ",newChart.data)
+    },
+    NewClient(newClient) {
+      // console.log("clientNew: ",newClient)
+    },
+    OldClient(OldClient) {
+      // console.log("clientOld: ",OldClient)
+    },
   },
   methods: {
-    filterPaymentsByDateRange(ResultQuery , startDate, endDate) {
-      return ResultQuery.filter(payment => {
-        const [day, month, year] = payment.date.split('.');
-        const paymentDate = new Date(year, month - 1, day);
-        return paymentDate >= startDate && paymentDate <= endDate;
+      filterPaymentsByDateRange(ResultQuery, startDate, endDate) {
+    return ResultQuery.filter(payment => {
+      const [day, month, year] = payment.date.split('.');
+      const paymentDate = new Date(year, month - 1, day);
+      return paymentDate >= startDate && paymentDate <= endDate;
+    });
+  },
+    initChart() {
+      const ctx = document.getElementById('myChart-Records').getContext('2d');
+
+      // Уничтожаем предыдущий график, если он существует
+      if (this.myChart) {
+        this.myChart.destroy();
+      }
+
+      this.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: this.initialData,
+        options: {
+          animation: {
+            duration: 3000
+          },
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              stacked: true,
+              beginAtZero: true
+            },
+            x: {
+              stacked: true
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          barPercentage: 0.3
+        }
       });
     },
-    async getTotalRecod(allRecords, startDate, endDate){
+    getTotalRecod(allRecords, startDate, endDate) {
       let allRecord = this.filterPaymentsByDateRange(allRecords, startDate, endDate)
-      let recordsByHour = {};
+      let recordsByHour = {}; // Изменено: теперь это объект, где каждый час имеет свой собственный массив
       allRecord.forEach(record => {
         let startTime = record.start;
         let startHour = startTime.split(' ')[1].split(':')[0];
@@ -60,64 +190,169 @@ export default {
         let endTime = record.end;
         let endHour = endTime.split(' ')[1].split(':')[0];
 
-        // Преобразуем в числа
         startHour = parseInt(startHour);
         endHour = parseInt(endHour);
 
-        // Уменьшаем endHour на 1
         if (startHour === endHour) {
-          console.log("start: ",startHour)
-          console.log("end: ", endHour)
           const hourString = startHour < 10 ? "0" + startHour + ":00" : startHour + ":00";
           if (this.times.includes(hourString)) {
+            // Изменено: проверяем, есть ли массив для этого часа, и создаем его, если он не существует
             if (!recordsByHour[hourString]) {
-              recordsByHour[hourString] = 1;
-            } else {
-              recordsByHour[hourString]++;
+              recordsByHour[hourString] = [0, 0];
             }
+            // Изменено: добавляем запись в соответствующий массив, основываясь на значении record.isFirst
+            const index = record.isFirst ? 0 : 1;
+            recordsByHour[hourString][index]++; // Инкрементируем соответствующий индекс массива
           }
         } else {
           endHour -= 1;
           for (let hour = startHour; hour <= endHour; hour++) {
             const hourString = hour < 10 ? "0" + hour + ":00" : hour + ":00";
             if (this.times.includes(hourString)) {
+              // Изменено: проверяем, есть ли массив для этого часа, и создаем его, если он не существует
               if (!recordsByHour[hourString]) {
-                recordsByHour[hourString] = 1;
-              } else {
-                recordsByHour[hourString]++;
+                recordsByHour[hourString] = [0, 0];
               }
+              // Изменено: добавляем запись в соответствующий массив, основываясь на значении record.isFirst
+              const index = record.isFirst ? 0 : 1;
+              recordsByHour[hourString][index]++; // Инкрементируем соответствующий индекс массива
             }
           }
         }
-
-
-
-
       });
-      this.result = recordsByHour
-      console.log("result in function ", this.result);
+      const sortedKeys = Object.keys(recordsByHour)
+          .sort((a, b) => {
+            const timeA = parseInt(a.split(':')[0]);
+            const timeB = parseInt(b.split(':')[0]);
+            return timeA - timeB;
+          });
+
+
+      const sortedResult = {};
+      sortedKeys.forEach(key => {
+        sortedResult[key] =recordsByHour[key];
+      });
+
+      this.result = sortedResult;
+      let values = Object.values(this.result)
+      let label = Object.keys(this.result)
+      // console.log("values: ",values.map(arr => arr[0]))
+      let newValue = values.map(arr => arr[0]);
+      let oldValue = values.map(arr => arr[1]);
+      this.label = label
+      this.NewClient = newValue
+      this.OldClient = oldValue
+      return values
     },
-    async DayRes(){
+    updateChart(interval) {
       const today = new Date();
-      const startDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const endDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      await this.getTotalRecod(this.allRecordsByPeriod, startDay, endDay);
-    },
-    async WeekRes(){
-      const today = new Date()
-      const startWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
-      const endWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      await this.getTotalRecod(this.allRecordsByPeriod, startWeek, endWeek);
-    },
-    async MonthRes(){
-      const today = new Date()
-      const StartMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-      const endMonth = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      await this.getTotalRecod(this.allRecordsByPeriod, StartMonth, endMonth);
+      var newData = {};
+      switch (interval) {
+        case 'hour':
+          const startDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          const endDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          this.getTotalRecod(this.allRecordsByPeriod, startDay, endDay);
+          newData = {
+            labels: this.label,
+            datasets: [
+              {
+                label: 'Первоходки',
+                data: this.NewClient,
+                backgroundColor: '#31b7e3',
+              },
+              {
+                label: 'Старые',
+                data: this.OldClient,
+                backgroundColor: '#070551',
+              }
+            ]
+          };
+          break;
+        case 'day':
+          const startWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
+          const endWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          this.getTotalRecod(this.allRecordsByPeriod, startWeek, endWeek);
+          newData = {
+            labels: this.label,
+            datasets: [
+              {
+                label: 'Первоходки',
+                data: this.NewClient,
+                backgroundColor: '#31b7e3',
+              },
+              {
+                label: 'Старые',
+                data: this.OldClient,
+                backgroundColor: '#070551',
+              }
+            ]
+          };
+          break;
+        case 'weekday':
+          const StartMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate())
+          const endMonth = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+          this.getTotalRecod(this.allRecordsByPeriod, StartMonth, endMonth);
+          newData = {
+            labels: this.label,
+            datasets: [
+              {
+                label: 'Первоходки',
+                data: this.NewClient,
+                backgroundColor: '#31b7e3',
+              },
+              {
+                label: 'Старые',
+                data: this.OldClient,
+                backgroundColor: '#070551',
+              }
+            ]
+          };
+          break;
+      }
+      this.myChart.data = newData;
+      this.myChart.update();
     }
   }
-}
+};
 </script>
-<style>
 
+
+<style>
+#chart-container {
+  max-width: 900px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  padding: 20px;
+}
+
+#myChart-Records {
+  height: 350px;
+}
+
+.btn-container {
+  max-width: 900px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-container button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  font-size: 16px;
+  background-color: #030352;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btn-container button:hover {
+  background-color: #020235;
+}
+
+.btn-container button:focus {
+  outline: none;
+}
 </style>

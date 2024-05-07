@@ -48,9 +48,7 @@
       >
       </fixed-plugin>
       <datestat></datestat>
-<!--      <diagramm></diagramm>-->
-
-<!--      <dashboard-content> </dashboard-content>-->
+      <records-diagramm></records-diagramm>
       <content-footer v-if="!$route.meta.hideFooter"></content-footer>
     </div>
   </div>
@@ -64,15 +62,17 @@ import DashboardContent from "./Content.vue";
 import FixedPlugin from "./Extra/FixedPlugin.vue";
 // import Diagramm from "@/pages/Layout/Diagramm.vue";
 import Datestat from "@/pages/Layout/DateStat.vue";
-
+import RecordsDiagramm from "@/pages/Layout/RecordsDiagramm.vue";
 export default {
   components: {
     TopNavbar,
+
     // DashboardContent,
     ContentFooter,
     // MobileMenu,
     // Diagramm,
     Datestat,
+    RecordsDiagramm,
     FixedPlugin,
   },
   data() {
