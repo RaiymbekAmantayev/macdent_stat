@@ -28,7 +28,7 @@ export default {
         labels: this.label,
         datasets: [
           {
-            label: 'Первоходки',
+            label: 'Первый раз',
             data: this.NewClient,
             backgroundColor: '#31b7e3',
           },
@@ -43,7 +43,7 @@ export default {
         labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
         datasets: [
           {
-            label: 'Первоходки',
+            label: 'Первый раз',
             data: [400, 500, 90, 151, 206, 155, 400],
             backgroundColor: '#31b7e3',
           },
@@ -58,7 +58,7 @@ export default {
         labels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл'],
         datasets: [
           {
-            label: 'Первоходки',
+            label: 'Первый раз',
             data: [100, 55, 70, 180, 200, 160, 300],
             backgroundColor: '#31b7e3',
           },
@@ -90,35 +90,35 @@ export default {
         return response.data.zapisi;
       });
       this.allRecordsByPeriod = this.filterPaymentsByDateRange(Records, StartMonth, endMonth)
-    var newData = {};
-    let values = this.getTotalRecod(this.allRecordsByPeriod , startDay, endDay);
-    this.label = Object.keys(this.result);
-    let newValue = values.map(arr => arr[0]);
-    let oldValue = values.map(arr => arr[1]);
-    this.NewClient = newValue
-    this.OldClient = oldValue
-    newData = {
-      labels: this.label,
-      datasets: [
-        {
-          label: 'Первоходки',
-          data: this.NewClient,
-          backgroundColor: '#31b7e3',
-        },
-        {
-          label: 'Старые',
-          data: this.OldClient,
-          backgroundColor: '#070551',
-        }
-      ]
-    };
+      var newData = {};
+      let values = this.getTotalRecod(this.allRecordsByPeriod , startDay, endDay);
+      this.label = Object.keys(this.result);
+      let newValue = values.map(arr => arr[0]);
+      let oldValue = values.map(arr => arr[1]);
+      this.NewClient = newValue
+      this.OldClient = oldValue
+      newData = {
+        labels: this.label,
+        datasets: [
+          {
+            label: 'Первый раз',
+            data: this.NewClient,
+            backgroundColor: '#31b7e3',
+          },
+          {
+            label: 'Старые',
+            data: this.OldClient,
+            backgroundColor: '#070551',
+          }
+        ]
+      };
 
-    // Установка данных в initialData
-    this.initialData.labels = newData.labels;
-    this.initialData.datasets = newData.datasets;
+      // Установка данных в initialData
+      this.initialData.labels = newData.labels;
+      this.initialData.datasets = newData.datasets;
 
-    // Вызов метода updateChart() после установки initialData
-    this.updateChart();
+      // Вызов метода updateChart() после установки initialData
+      this.updateChart();
     }catch (e){
       // console.log(e)
     }
@@ -139,13 +139,13 @@ export default {
     },
   },
   methods: {
-      filterPaymentsByDateRange(ResultQuery, startDate, endDate) {
-    return ResultQuery.filter(payment => {
-      const [day, month, year] = payment.date.split('.');
-      const paymentDate = new Date(year, month - 1, day);
-      return paymentDate >= startDate && paymentDate <= endDate;
-    });
-  },
+    filterPaymentsByDateRange(ResultQuery, startDate, endDate) {
+      return ResultQuery.filter(payment => {
+        const [day, month, year] = payment.date.split('.');
+        const paymentDate = new Date(year, month - 1, day);
+        return paymentDate >= startDate && paymentDate <= endDate;
+      });
+    },
     initChart() {
       const ctx = document.getElementById('myChart-Records').getContext('2d');
 
@@ -256,7 +256,7 @@ export default {
             labels: this.label,
             datasets: [
               {
-                label: 'Первоходки',
+                label: 'Первый раз',
                 data: this.NewClient,
                 backgroundColor: '#31b7e3',
               },
@@ -276,7 +276,7 @@ export default {
             labels: this.label,
             datasets: [
               {
-                label: 'Первоходки',
+                label: 'Первый раз',
                 data: this.NewClient,
                 backgroundColor: '#31b7e3',
               },
@@ -296,7 +296,7 @@ export default {
             labels: this.label,
             datasets: [
               {
-                label: 'Первоходки',
+                label: 'Первый раз',
                 data: this.NewClient,
                 backgroundColor: '#31b7e3',
               },
@@ -323,6 +323,8 @@ export default {
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
   margin: 0 auto;
   padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
 }
 
 #myChart-Records {
