@@ -85,92 +85,181 @@
         Employees
       </div>
     </div>
-    <table>
-      <tr>
-        <th>Названия</th>
-        <th>День</th>
-        <th>Неделя</th>
-        <th>Месяц</th>
+    <table class="table-overlay-table">
+      <tr class="table-overlay-table-tr">
+        <th class="table-overlay-table-th">Названия</th>
+        <th class="table-overlay-table-th">День</th>
+        <th class="table-overlay-table-th">Неделя</th>
+        <th class="table-overlay-table-th">Месяц</th>
+      </tr>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">Выручка</td>
+        <td class="table-overlay-table-td">{{ payments.total_paid_day }}</td>
+        <td class="table-overlay-table-td">{{ payments.total_paid_week }}</td>
+        <td class="table-overlay-table-td">{{ payments.total_paid_month }}</td>
+      </tr>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">количество записей</td>
+        <td class="table-overlay-table-td">{{ record.count_for_today }}</td>
+        <td class="table-overlay-table-td">{{ record.count_week }}</td>
+        <td class="table-overlay-table-td">{{ record.count_month }}</td>
       </tr>
       <tr>
-        <td>Выручка</td>
-        <td>{{ payments.total_paid_day }}</td>
-        <td>{{ payments.total_paid_week }}</td>
-        <td>{{ payments.total_paid_month }}</td>
+        <td class="table-overlay-table-td">Количество пришедших</td>
+        <td class="table-overlay-table-td">{{ record.came_day }}</td>
+        <td class="table-overlay-table-td">{{ record.came_week }}</td>
+        <td class="table-overlay-table-td">{{ record.came_month }}</td>
       </tr>
-      <tr>
-        <td>количество записей</td>
-        <td>{{ record.count_for_today }}</td>
-        <td>{{ record.count_week }}</td>
-        <td>{{ record.count_month }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">Количество отклонивших</td>
+        <td class="table-overlay-table-td">{{ record.rejected_day }}</td>
+        <td class="table-overlay-table-td">{{ record.rejected_week }}</td>
+        <td class="table-overlay-table-td">{{ record.rejected_month }}</td>
       </tr>
-      <tr>
-        <td>Количество пришедших</td>
-        <td>{{ record.came_day }}</td>
-        <td>{{ record.came_week }}</td>
-        <td>{{ record.came_month }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">количество записей на завтра</td>
+        <td class="table-overlay-table-td">{{ record.count_for_tomorrow }}</td>
       </tr>
-      <tr>
-        <td>Количество отклонивших</td>
-        <td>{{ record.rejected_day }}</td>
-        <td>{{ record.rejected_week }}</td>
-        <td>{{ record.rejected_month }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">средний чек</td>
+        <td v-if="!payments.avg_paid_day" class="table-overlay-table-td">0</td>
+        <td v-else-if="payments.avg_paid_day" class="table-overlay-table-td">{{ Math.floor(payments.avg_paid_day) }}
+        </td>
+        <td class="table-overlay-table-td"> {{ Math.floor(payments.avg_paid_week) }}</td>
+        <td class="table-overlay-table-td">{{ Math.floor(payments.avg_paid_month) }}</td>
       </tr>
-      <tr>
-        <td>количество записей на завтра</td>
-        <td>{{ record.count_for_tomorrow }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">Kaspi pay</td>
+        <td class="table-overlay-table-td">{{ payments.kaspiPay_day }}</td>
+        <td class="table-overlay-table-td">{{ payments.kaspiPay_week }}</td>
+        <td class="table-overlay-table-td">{{ payments.kaspiPay_month }}</td>
       </tr>
-      <tr>
-        <td>средний чек</td>
-        <td v-if="!payments.avg_paid_day">0</td>
-        <td v-else-if="payments.avg_paid_day">{{ Math.floor(payments.avg_paid_day) }}</td>
-        <td> {{ Math.floor(payments.avg_paid_week) }}</td>
-        <td>{{ Math.floor(payments.avg_paid_month) }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">Наличные</td>
+        <td class="table-overlay-table-td">{{ payments.cash_day }}</td>
+        <td class="table-overlay-table-td">{{ payments.cash_week }}</td>
+        <td class="table-overlay-table-td">{{ payments.cash_month }}</td>
       </tr>
-      <tr>
-        <td>Kaspi pay</td>
-        <td>{{ payments.kaspiPay_day }}</td>
-        <td>{{ payments.kaspiPay_week }}</td>
-        <td>{{ payments.kaspiPay_month }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">Количество обращении общее</td>
+        <td class="table-overlay-table-td">{{ this.whereKnow.allRef_day }}</td>
+        <td class="table-overlay-table-td">{{ this.whereKnow.allRef_week }}</td>
+        <td class="table-overlay-table-td">{{ this.whereKnow.allRef_month }}</td>
       </tr>
-      <tr>
-        <td>Наличные</td>
-        <td>{{ payments.cash_day }}</td>
-        <td>{{ payments.cash_week }}</td>
-        <td>{{ payments.cash_month }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">2гис</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.two_gis.day }}</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.two_gis.week }}</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.two_gis.month }}</td>
       </tr>
-      <tr>
-        <td>Количество обращении общее</td>
-        <td>{{ this.whereKnow.allRef_day }}</td>
-        <td>{{ this.whereKnow.allRef_week }}</td>
-        <td>{{ this.whereKnow.allRef_month }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">интернет</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.internet.day }}</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.internet.week }}</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.internet.month }}</td>
       </tr>
-      <tr>
-        <td>2гис</td>
-        <td>{{ this.patients.whereKnow.two_gis.day }}</td>
-        <td>{{ this.patients.whereKnow.two_gis.week }}</td>
-        <td>{{ this.patients.whereKnow.two_gis.month }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">Рекомендации</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.recomend.day }}</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.recomend.week }}</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.recomend.month }}</td>
       </tr>
-      <tr>
-        <td>интернет</td>
-        <td>{{ this.patients.whereKnow.internet.day }}</td>
-        <td>{{ this.patients.whereKnow.internet.week }}</td>
-        <td>{{ this.patients.whereKnow.internet.month }}</td>
-      </tr>
-      <tr>
-        <td>Рекомендации</td>
-        <td>{{ this.patients.whereKnow.recomend.day }}</td>
-        <td>{{ this.patients.whereKnow.recomend.week }}</td>
-        <td>{{ this.patients.whereKnow.recomend.month }}</td>
-      </tr>
-      <tr>
-        <td>Старая база</td>
-        <td>{{ this.patients.whereKnow.old_db.day }}</td>
-        <td>{{ this.patients.whereKnow.old_db.week }}</td>
-        <td>{{ this.patients.whereKnow.old_db.month }}</td>
+      <tr class="table-overlay-table-tr">
+        <td class="table-overlay-table-td">Старая база</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.old_db.day }}</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.old_db.week }}</td>
+        <td class="table-overlay-table-td">{{ this.patients.whereKnow.old_db.month }}</td>
       </tr>
     </table>
 
+    <div class="table">
+      <table class="table-overlay-tableTwo">
+        <tr class="table-overlay-table-trTwo">
+          <th>Названия</th>
+          <th>День</th>
+          <th>Неделя</th>
+          <th>Месяц</th>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">Выручка</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.total_paid_day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.total_paid_week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.total_paid_month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">количество записей</td>
+          <td class="table-overlay-table-tdTwo">{{ record.count_for_today }}</td>
+          <td class="table-overlay-table-tdTwo">{{ record.count_week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ record.count_month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">Количество пришедших</td>
+          <td class="table-overlay-table-tdTwo">{{ record.came_day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ record.came_week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ record.came_month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">Количество отклонивших</td>
+          <td class="table-overlay-table-tdTwo">{{ record.rejected_day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ record.rejected_week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ record.rejected_month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">количество записей на завтра</td>
+          <td class="table-overlay-table-tdTwo">{{ record.count_for_tomorrow }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">средний чек</td>
+          <td v-if="!payments.avg_paid_day" class="table-overlay-table-tdTwo">0</td>
+          <td v-else-if="payments.avg_paid_day" class="table-overlay-table-tdTwo">{{ Math.floor(payments.avg_paid_day)
+            }}</td>
+          <td class="table-overlay-table-tdTwo"> {{ Math.floor(payments.avg_paid_week) }}</td>
+          <td class="table-overlay-table-tdTwo">{{ Math.floor(payments.avg_paid_month) }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">Kaspi pay</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.kaspiPay_day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.kaspiPay_week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.kaspiPay_month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">Наличные</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.cash_day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.cash_week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ payments.cash_month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">Количество обращении общее</td>
+          <td class="table-overlay-table-tdTwo">{{ this.whereKnow.allRef_day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.whereKnow.allRef_week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.whereKnow.allRef_month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">2гис</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.two_gis.day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.two_gis.week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.two_gis.month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">интернет</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.internet.day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.internet.week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.internet.month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">Рекомендации</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.recomend.day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.recomend.week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.recomend.month }}</td>
+        </tr>
+        <tr class="table-overlay-table-trTwo">
+          <td class="table-overlay-table-tdTwo">Старая база</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.old_db.day }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.old_db.week }}</td>
+          <td class="table-overlay-table-tdTwo">{{ this.patients.whereKnow.old_db.month }}</td>
+        </tr>
+      </table>
+    </div>
 
 
     <DoctorTotal :doctorTotal="doctors.doctorTotal" :busy_time="doctors.busy_Time"
@@ -869,7 +958,7 @@ body {
 }
 
 
-table {
+.table-overlay-table {
   border-collapse: collapse;
   border-radius: 3px;
   width: 900px;
@@ -880,8 +969,8 @@ table {
   box-shadow: 0px 0px 20px 12px white;
 }
 
-th,
-td {
+.table-overlay-table-th,
+.table-overlay-table-td {
   border: 1px solid #efeeee;
   padding: 8px 8px 8px 60px;
   text-align: left;
@@ -898,7 +987,7 @@ td {
   opacity: 0.6;
 }
 
-th {
+.table-overlay-table-th {
   color: #dd9122;
   padding: 80px 8px 8px 60px;
 }
@@ -999,25 +1088,54 @@ select option {
   width: 200px;
 }
 
+.table-overlay-tableTwo {
+  display: none;
+}
+
 @media screen and (max-width: 800px) {
 
-
-  table {
-    max-width: 95%;
-    margin-right: 0;
+  .table {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-right: 6px;
+    margin-left: 6px;
+    padding: 15px;
+    font-family: 'Lato', sans-serif;
+    /* margin: 0 auto; */
+    border-radius: 3px;
+    max-width: 850px;
+    top: 75px;
+    color: #fff;
+    background-color: #f88c19;
+    transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
+    box-shadow: 0 2px 25px rgba(253, 131, 0, 0.5);
   }
 
-  td {
+  .table-overlay-tableTwo {
+    display: block;
+    border-collapse: collapse;
+  }
+
+
+  .table-overlay-table {
+    /* max-width: 95%;
+    margin-right: 0; */
+    display: none;
+  }
+
+  .table-overlay-table-tdTwo {
     padding: 8px 8px 8px 8px;
   }
 
-  th {
+  .table-overlay-table-thTwo {
     text-align: center;
     padding: 80px 46px 8px 8px;
   }
 
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
+  .table-overlay-table-thTwo,
+  .table-overlay-table-tdTwo {
+    border: 1px solid #efeeee;
+    font-family: 'Montserrat', sans-serif;
   }
 
   .about__content {
@@ -1063,7 +1181,7 @@ select option {
   }
 
   .table-overlay {
-    max-width: 90%;
+    display: none;
   }
 
   .chart-container {
