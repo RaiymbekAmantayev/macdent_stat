@@ -393,7 +393,6 @@ export default {
           hasPayments = false;
         }
       } catch (error) {
-        console.error("Error fetching payment data:", error);
         // Обработка ошибок, если необходимо
         hasPayments = false; // Прерываем цикл в случае ошибки
       }
