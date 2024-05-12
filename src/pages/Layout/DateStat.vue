@@ -372,6 +372,8 @@ export default {
     this.initializeChart();
     this.toggleDateInputs()
 
+
+    const promisesPayment = [];
     function filterPaymentsByDateRange(ResultQuery, startDate, endDate) {
       return ResultQuery.filter(payment => {
         const [day, month, year] = payment.date.split('.');
@@ -379,29 +381,13 @@ export default {
         return paymentDate >= startDate && paymentDate <= endDate;
       });
     }
-    const promisesPayment = [];
-    let currentPagePayment = 1;
-    let hasPayments = true;
-
-    while (hasPayments) {
-      try {
-        const responsePayment = await axios.get(`https://api-developer.macdent.kz/payment/find/?page=${currentPagePayment}&access_token=${API_KEY}`);
-        if (responsePayment.data.pays.length > 0) {
-          promisesPayment.push(responsePayment);
-          currentPagePayment++;
-        } else {
-          hasPayments = false;
-        }
-      } catch (error) {
-        // Обработка ошибок, если необходимо
-        hasPayments = false; // Прерываем цикл в случае ошибки
-      }
+    for (let i = 1; i <= 7; i++) {
+      promisesPayment.push(axios.get(`https://api-developer.macdent.kz/payment/find/?page=${i}&access_token=${API_KEY}`));
     }
-
-    const ResPayments = promisesPayment.flatMap(response => {
-      return response.data.pays;
-    });
-
+    const responsePayment = await Promise.all(promisesPayment);
+    const ResPayments = responsePayment.flatMap(response => {
+      return response.data.pays
+    })
 
     // console.log("allPayments-2022-2024: ",ResPayments)
     // let whereKnows = axios.get(`https://api-developer.macdent.kz/where_know/find/?access_token=${API_KEY}`)
@@ -420,20 +406,14 @@ export default {
     this.payments.allPayments = filterPaymentsByDateRange(ResPayments, startDate, endDate)
     // console.log("AllPayments: ", this.payments.allPayments)
     try {
-      let recordsPromises = [];
-      let currentPage = 1;
-      let hasRecords = true;
-      while (hasRecords) {
-        const response = await axios.get(`https://api-developer.macdent.kz/zapis/find/?page=${currentPage}&access_token=${API_KEY}`);
-        if (response.data.zapisi.length > 0) {
-          recordsPromises = recordsPromises.concat(response.data.zapisi); // Обновляем массив
-          currentPage++;
-        } else {
-          hasRecords = false;
-        }
+      const promises = [];
+      for (let i = 1; i <= 60; i++) {
+        promises.push(axios.get(`https://api-developer.macdent.kz/zapis/find/?page=${i}&access_token=${API_KEY}`));
       }
-
-      const Records = await Promise.all(recordsPromises);
+      const responses = await Promise.all(promises);
+      const Records = responses.flatMap(response => {
+        return response.data.zapisi;
+      });
       let AllRec = filterPaymentsByDateRange(Records, startDate, endDate)
       this.record.allRecords = AllRec
       let tomorrow = filterPaymentsByDateRange(this.record.allRecords, startTomorrow, endTomorrow)

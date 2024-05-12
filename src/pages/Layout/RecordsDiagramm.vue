@@ -81,19 +81,14 @@ export default {
     const endDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     try{
-      let recordsPromises = []; // Используем другое имя переменной
-      let currentPage = 1;
-      let hasRecords = true;
-      while (hasRecords) {
-        const response = await axios.get(`https://api-developer.macdent.kz/zapis/find/?page=${currentPage}&access_token=${API_KEY}`);
-        if (response.data.zapisi.length > 0) {
-          recordsPromises = recordsPromises.concat(response.data.zapisi); // Обновляем массив
-          currentPage++;
-        } else {
-          hasRecords = false;
-        }
+      const promises = [];
+      for (let i = 1; i <= 60; i++) {
+        promises.push(axios.get(`https://api-developer.macdent.kz/zapis/find/?page=${i}&access_token=${API_KEY}`));
       }
-      const Records = await Promise.all(recordsPromises);
+      const responses = await Promise.all(promises);
+      const Records = responses.flatMap(response => {
+        return response.data.zapisi;
+      });
       this.allRecordsByPeriod = this.filterPaymentsByDateRange(Records, StartMonth, endMonth)
       var newData = {};
       let values = this.getTotalRecod(this.allRecordsByPeriod , startDay, endDay);
